@@ -62,4 +62,15 @@ public class Usuario {
     public void setPublicaciones(List<Publicacion> publicaciones) {
         this.publicaciones = publicaciones;
     }
+
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "userName='" + userName + '\'' +
+                ", email='" + email + '\'' +
+                ", urlImagenPerfil='" + urlImagenPerfil + '\'' +
+                ", fechaRegistro=" + fechaRegistro.toDate() +
+                ", publicaciones=" + publicaciones +
+                '}';
+    }
 }

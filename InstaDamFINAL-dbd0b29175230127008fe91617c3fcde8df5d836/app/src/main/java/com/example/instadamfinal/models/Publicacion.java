@@ -27,4 +27,12 @@ public class Publicacion {
     public void setUrlImagenPublicacion(String urlImagenPublicacion) {
         this.urlImagenPublicacion = urlImagenPublicacion;
     }
+
+    @Override
+    public String toString() {
+        return "Publicacion{" +
+                "numeroDeLikes=" + numeroDeLikes +
+                ", urlImagenPublicacion='" + urlImagenPublicacion + '\'' +
+                '}';
+    }
 }

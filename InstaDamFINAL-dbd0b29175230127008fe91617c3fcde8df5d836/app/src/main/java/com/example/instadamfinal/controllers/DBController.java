@@ -47,7 +47,7 @@ public class DBController {
             DataBaseHelper dataBaseHelper = new DataBaseHelper(context);
             result = dataBaseHelper.createNewUserHelper(userName,email,password);
             if (result){
-
+                //Aqui crear una clase independiente para utilizar todo de firebase.
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 //Publicaciones iniciales/ejemplos
                 Publicacion publicacionEjemplo = new Publicacion(0,"default_user.jpg");

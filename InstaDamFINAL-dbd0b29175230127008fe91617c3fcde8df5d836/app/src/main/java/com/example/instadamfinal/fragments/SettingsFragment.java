@@ -3,10 +3,10 @@ package com.example.instadamfinal.fragments;
 import static android.app.Activity.RESULT_OK;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+import static com.example.instadamfinal.activities.MainActivity.emailUsuarioStatic;
 import static com.example.instadamfinal.activities.MainActivity.idUsuario;
-import static com.example.instadamfinal.activities.MainActivity.imagenUsuario;
-import static com.example.instadamfinal.activities.MainActivity.usuarioLogeado;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +17,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,9 +31,13 @@ import android.widget.Toast;
 
 import com.example.instadamfinal.R;
 import com.example.instadamfinal.controllers.FirebaseManager;
+import com.example.instadamfinal.models.Usuario;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -49,6 +54,7 @@ public class SettingsFragment extends Fragment {
     private Bitmap imagenDescargadaPerfil;
     private TextView textViewNombreUsuario;
     private TextView textViewEmailUsuario;
+    private Usuario usuarioLogeado;
 
     private static final int SELECT_PHOTO = 100;
 
@@ -68,15 +74,37 @@ public class SettingsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        cargarImagenActualPerfil(view);
-        cargarDatosActualPerfil(view);
+        // Mostrar Toast de carga
+        Toast.makeText(getContext(), "Cargando datos...", Toast.LENGTH_SHORT).show();
 
+        // Creamos una referencia para usuarios_db
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference usuariosDBRef = db.collection("usuarios_db").document("usuario_" + emailUsuarioStatic);
 
+        usuariosDBRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                // Ocultar Toast cuando los datos se hayan descargado
+                Toast.makeText(getContext(), "Datos cargados", Toast.LENGTH_SHORT).show();
 
+                if (documentSnapshot.exists()) {
+                    Usuario usuario = documentSnapshot.toObject(Usuario.class);
+                    // Verifica si el objeto Usuario es null
+                    if (usuario != null) {
+                        // Usa el objeto Usuario aquí
+                        setUsuarioLogeado(usuario);
+                        cargarImagenActualPerfil(view);
+                        cargarDatosActualPerfil(view);
 
-
-
-
+                    } else {
+                        Log.e(FragmentManager.TAG, "El objeto Usuario es null");
+                    }
+                } else {
+                    Log.e(FragmentManager.TAG, "El documento no existe");
+                }
+            }
+        });
 
 
 
@@ -110,14 +138,16 @@ public class SettingsFragment extends Fragment {
         });*/
         return view;
     }
-
+    private void setUsuarioLogeado(Usuario usuario) {
+        usuarioLogeado = usuario;
+    }
     private void cargarDatosActualPerfil(View view) {
         textViewNombreUsuario = view.findViewById(R.id.textViewNombreUsuario);
         textViewEmailUsuario = view.findViewById(R.id.textViewEmailUsuario);
         //aqui usamos los datos del Usuario:usuarioLogeado
 
-       // textViewNombreUsuario.setText(usuarioLogeado.getNombreUsuario());
-       // textViewEmailUsuario.setText(usuarioLogeado.getEmailUsuario());
+       textViewNombreUsuario.setText(usuarioLogeado.getUserName());
+       textViewEmailUsuario.setText(usuarioLogeado.getEmail());
 
     }
 
@@ -125,7 +155,7 @@ public class SettingsFragment extends Fragment {
     private void cargarImagenActualPerfil(View view) {
         imageViewPerfilUsuario = view.findViewById(R.id.imageViewPerfilUsuario);
 
-        FirebaseManager.downloadImage(getContext(), imagenUsuario.getNombre_imagen(), new FirebaseManager.OnImageDownloadListener() {
+        FirebaseManager.downloadImage(getContext(), usuarioLogeado.getUrlImagenPerfil(), new FirebaseManager.OnImageDownloadListener() {
             @Override
             public void onImageDownload(Bitmap bitmap) {
                 if (bitmap != null) {
