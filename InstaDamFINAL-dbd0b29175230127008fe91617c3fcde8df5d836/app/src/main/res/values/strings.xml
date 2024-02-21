@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">InstaDamFINAL</string>
+    <string name="app_name_dam">InstaDAM</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="introduce_userName">Introduce tu nombre de usuario:</string>
+    <string name="userName">Usuario</string>
+    <string name="introduce_email">Introduce tu email:</string>
+    <string name="email">E-mail</string>
+    <string name="introduce_contrasenia">Introduce tu contraseña:</string>
+    <string name="contrsenia">Contraseña</string>
+    <string name="enviar_button">Enviar</string>
+    <string name="registro_button">Registrarse</string>
+    <string name="volver_button">Volver</string>
+    <string name="cargar_imagen">Añade una imagen para modificar tu imagen de perfil</string>
+    <string name="subir_imagen">Subir imagen</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

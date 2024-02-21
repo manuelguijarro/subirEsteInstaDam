@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "527383341100",
+    "project_id": "instadam-76807",
+    "storage_bucket": "instadam-76807.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527383341100:android:000b461801fa0ea7114989",
+        "android_client_info": {
+          "package_name": "com.example.instadamfinal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDx4qkY54smJsOFBDgFAqIc0Um_czyg-G4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
