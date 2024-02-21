@@ -106,7 +106,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (cursor != null && cursor.moveToFirst()) {
             String nombreUsuario = cursor.getString(cursor.getColumnIndexOrThrow(StructureDB.COLUMN_USERNAME));
             String emailUsuario = cursor.getString(cursor.getColumnIndexOrThrow(StructureDB.COLUMN_EMAIL));
-            usuario = new Usuario(nombreUsuario, emailUsuario);
             cursor.close();
         }
 

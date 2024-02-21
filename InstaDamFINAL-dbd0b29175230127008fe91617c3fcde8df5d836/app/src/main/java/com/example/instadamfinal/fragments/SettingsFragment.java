@@ -4,6 +4,8 @@ import static android.app.Activity.RESULT_OK;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import static com.example.instadamfinal.activities.MainActivity.idUsuario;
+import static com.example.instadamfinal.activities.MainActivity.imagenUsuario;
+import static com.example.instadamfinal.activities.MainActivity.usuarioLogeado;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -112,14 +114,18 @@ public class SettingsFragment extends Fragment {
     private void cargarDatosActualPerfil(View view) {
         textViewNombreUsuario = view.findViewById(R.id.textViewNombreUsuario);
         textViewEmailUsuario = view.findViewById(R.id.textViewEmailUsuario);
-        //
+        //aqui usamos los datos del Usuario:usuarioLogeado
+
+       // textViewNombreUsuario.setText(usuarioLogeado.getNombreUsuario());
+       // textViewEmailUsuario.setText(usuarioLogeado.getEmailUsuario());
+
     }
 
     //ESTE METODO LO USAMOS PARA CARGAR CORRECTAAMENTE LA IMAGEN
     private void cargarImagenActualPerfil(View view) {
         imageViewPerfilUsuario = view.findViewById(R.id.imageViewPerfilUsuario);
 
-        FirebaseManager.downloadImage(getContext(), "imagen_archivo", new FirebaseManager.OnImageDownloadListener() {
+        FirebaseManager.downloadImage(getContext(), imagenUsuario.getNombre_imagen(), new FirebaseManager.OnImageDownloadListener() {
             @Override
             public void onImageDownload(Bitmap bitmap) {
                 if (bitmap != null) {
@@ -165,8 +171,6 @@ public class SettingsFragment extends Fragment {
                     Uri selectedImage = data.getData();
                     InputStream imageStream = getActivity().getContentResolver().openInputStream(selectedImage);
                    // imagenSubirActualizar = BitmapFactory.decodeStream(imageStream);
-
-                    //imagenPerfilActualizar.setImageBitmap(imagenSubirActualizar);
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();

@@ -1,27 +1,65 @@
 package com.example.instadamfinal.models;
 
+import com.google.firebase.Timestamp;
+
+import java.util.Date;
+import java.util.List;
+
 public class Usuario {
-    private String nombreUsuario;
-    private String emailUsuario;
+    private String userName;
+    private String  email;
+    private String urlImagenPerfil;
+    private Timestamp fechaRegistro;
+    private List<Publicacion> publicaciones;
 
-    public Usuario(String nombreUsuario, String emailUsuario) {
-        this.nombreUsuario = nombreUsuario;
-        this.emailUsuario = emailUsuario;
+    public Usuario() {
     }
 
-    public String getNombreUsuario() {
-        return nombreUsuario;
+    public Usuario(String userName, String email, String urlImagenPerfil, Timestamp fechaRegistro, List<Publicacion> publicaciones) {
+        this.userName = userName;
+        this.email = email;
+        this.urlImagenPerfil = urlImagenPerfil;
+        this.fechaRegistro = fechaRegistro;
+        this.publicaciones = publicaciones;
     }
 
-    public void setNombreUsuario(String nombreUsuario) {
-        this.nombreUsuario = nombreUsuario;
+    public String getUserName() {
+        return userName;
     }
 
-    public String getEmailUsuario() {
-        return emailUsuario;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public void setEmailUsuario(String emailUsuario) {
-        this.emailUsuario = emailUsuario;
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getUrlImagenPerfil() {
+        return urlImagenPerfil;
+    }
+
+    public void setUrlImagenPerfil(String urlImagenPerfil) {
+        this.urlImagenPerfil = urlImagenPerfil;
+    }
+
+    public Timestamp getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(Timestamp fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+    public List<Publicacion> getPublicaciones() {
+        return publicaciones;
+    }
+
+    public void setPublicaciones(List<Publicacion> publicaciones) {
+        this.publicaciones = publicaciones;
     }
 }

@@ -59,16 +59,21 @@ public class FirebaseManager {
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://instadam-76807.appspot.com");
         StorageReference storageRef = storage.getReference().child("imagenes").child(imageName);
         final long BYTES = 10*(1024 * 1024);
-        storageRef.getBytes(BYTES).addOnSuccessListener(bytes -> {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            listener.onImageDownload(bitmap);
-        }).addOnFailureListener(exception -> {
-            Log.e(TAG, "downloadImage: Failed to download image", exception);
-            Toast.makeText(context, "Error al descargar la imagen de perfil", Toast.LENGTH_SHORT).show();
-            listener.onImageDownload(null);
+        storageRef.getBytes(BYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                listener.onImageDownload(bitmap);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                Toast.makeText(context, "Error al descargar la imagen de perfil", Toast.LENGTH_SHORT).show();
+                listener.onImageDownload(null);
+            }
         });
     }
-
 
     /*
 
