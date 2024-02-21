@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.instadamfinal.R;
@@ -42,15 +43,10 @@ import java.util.Map;
 
 
 public class SettingsFragment extends Fragment {
-    private ImageView imagenPerfilActualizar;
-    private Button botonEnviarForm;
-    private Button buttonSubirImagen;
-
-    private EditText editTextUserName2;
-    private EditText editTextEmailAddress2;
-    private EditText editTextPassword2;
-    private Bitmap imagenSubirActualizar;
-
+    private ImageView imageViewPerfilUsuario;
+    private Bitmap imagenDescargadaPerfil;
+    private TextView textViewNombreUsuario;
+    private TextView textViewEmailUsuario;
 
     private static final int SELECT_PHOTO = 100;
 
@@ -64,35 +60,95 @@ public class SettingsFragment extends Fragment {
 
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+
+        cargarImagenActualPerfil(view);
+        cargarDatosActualPerfil(view);
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //cargarAtributos(view);
+        //Con esto cargariamos la imagen de el almacenamiento cuando el usuario hace click
+        //buttonSubirImagen.setOnClickListener(v -> selectImageFromGallery());
+
+        //PRIMERO VAMOS A MEJORAR LA DESCARGA DE IMAGEN.
+        // Si el usuario hace click en el boton de enviar datos, entonces la foto
+        //se tendrá que subir al servidor y tambien tenerla alojada en una referencia
+        //en base de datos, para poder referenciar a la url.
+       /* botonEnviarForm.setOnClickListener(v -> {
+            if (imagenSubirActualizar != null) {
+                FirebaseManager.uploadImage(getContext(),imagenSubirActualizar, "imagen_archivo", new FirebaseManager.MyResponseListener() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(getContext(), "Imagen subida correctamente", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Toast.makeText(getContext(), "Error al subir la imagen", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Toast.makeText(getContext(), "No has seleccionado ninguna imagen", Toast.LENGTH_SHORT).show();
+            }
+        });*/
+        return view;
+    }
+
+    private void cargarDatosActualPerfil(View view) {
+        textViewNombreUsuario = view.findViewById(R.id.textViewNombreUsuario);
+        textViewEmailUsuario = view.findViewById(R.id.textViewEmailUsuario);
+        //
+    }
+
+    //ESTE METODO LO USAMOS PARA CARGAR CORRECTAAMENTE LA IMAGEN
+    private void cargarImagenActualPerfil(View view) {
+        imageViewPerfilUsuario = view.findViewById(R.id.imageViewPerfilUsuario);
+
+        FirebaseManager.downloadImage(getContext(), "imagen_archivo", new FirebaseManager.OnImageDownloadListener() {
+            @Override
+            public void onImageDownload(Bitmap bitmap) {
+                if (bitmap != null) {
+                    imagenDescargadaPerfil = bitmap;
+                    // Aquí es donde debes establecer la imagen en el ImageView
+                    imageViewPerfilUsuario.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageViewPerfilUsuario.setImageBitmap(imagenDescargadaPerfil);
+                            imageViewPerfilUsuario.setVisibility(View.VISIBLE);
+                        }
+                    });
+                } else {
+                    // Maneja el caso en que la descarga falla o no hay imagen
+                    // Podrías mostrar una imagen predeterminada o hacer otra acción aquí
+                }
+            }
+        });
+    }
+
     private void cargarAtributos(View view) {
+        /*
         imagenPerfilActualizar = view.findViewById(R.id.imagenPerfilActualizar);
         botonEnviarForm = view.findViewById(R.id.botonEnviarForm);
         buttonSubirImagen = view.findViewById(R.id.buttonSubirImagen);
         editTextUserName2 = view.findViewById(R.id.editTextUserName2);
         editTextEmailAddress2 = view.findViewById(R.id.editTextEmailAddress2);
-        editTextPassword2 = view.findViewById(R.id.editTextPassword2);
+        editTextPassword2 = view.findViewById(R.id.editTextPassword2);*/
     }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
-        cargarAtributos(view);
-        //Con esto cargariamos la imagen de el almacenamiento cuando el usuario hace click
-        buttonSubirImagen.setOnClickListener(v -> selectImageFromGallery());
-        // Si el usuario hace click en el boton de enviar datos, entonces la foto
-        //se tendrá que subir al servidor y tambien tenerla alojada en una referencia
-        //en base de datos, para poder referenciar a la url.
-        botonEnviarForm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseManager.uploadImage(imagenSubirActualizar,"imagen_archivo");
-            }
-        });
-        return view;
-    }
-
     private void selectImageFromGallery() {
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
@@ -108,24 +164,10 @@ public class SettingsFragment extends Fragment {
                 try {
                     Uri selectedImage = data.getData();
                     InputStream imageStream = getActivity().getContentResolver().openInputStream(selectedImage);
-                    imagenSubirActualizar = BitmapFactory.decodeStream(imageStream);
+                   // imagenSubirActualizar = BitmapFactory.decodeStream(imageStream);
 
-                    // Cargar la imagen en un ImageView (para propósitos de demostración)
-                    imagenPerfilActualizar.setImageBitmap(imagenSubirActualizar);
+                    //imagenPerfilActualizar.setImageBitmap(imagenSubirActualizar);
 
-
-
-
-                    Map<String, Object> foto_perfil = new HashMap<>();
-                    foto_perfil.put("foto_perfil_id", 1);
-                    foto_perfil.put("id_usuario", idUsuario);
-                    //foto_perfil.put("url_imagen", nombreUrlFotoPerfil);
-
-                    /*
-                    FirebaseManager.addDocument("foto_perfiles", foto_perfil,
-                            aVoid -> Log.d(TAG, "Document added successfully"),
-                            e -> Log.e(TAG, "Error adding document", e));
-*/
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                     Toast.makeText(getContext(), "Error al cargar la imagen", Toast.LENGTH_SHORT).show();

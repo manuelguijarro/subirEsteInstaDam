@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
 import com.example.instadamfinal.controllers.PasswordController;
+import com.example.instadamfinal.models.Usuario;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "users";
@@ -85,4 +86,31 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         long numID = db.insert(StructureDB.PERSONAL_DATA_TABLE,null,values);
         return numID != -1;
     }
+
+
+    public Usuario buscarUsuarioPorEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                StructureDB.PERSONAL_DATA_TABLE,
+                new String[]{StructureDB.COLUMN_USERNAME, StructureDB.COLUMN_EMAIL},
+                StructureDB.COLUMN_EMAIL + " = ?",
+                new String[]{email},
+                null,
+                null,
+                null
+        );
+
+        Usuario usuario = null;
+
+        if (cursor != null && cursor.moveToFirst()) {
+            String nombreUsuario = cursor.getString(cursor.getColumnIndexOrThrow(StructureDB.COLUMN_USERNAME));
+            String emailUsuario = cursor.getString(cursor.getColumnIndexOrThrow(StructureDB.COLUMN_EMAIL));
+            usuario = new Usuario(nombreUsuario, emailUsuario);
+            cursor.close();
+        }
+
+        return usuario;
+    }
 }
+

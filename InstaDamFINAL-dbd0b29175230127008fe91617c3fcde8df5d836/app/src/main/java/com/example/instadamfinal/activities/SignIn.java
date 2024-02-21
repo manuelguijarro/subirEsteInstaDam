@@ -63,7 +63,7 @@ public class SignIn extends AppCompatActivity {
 
         if (userName != null) {
             showMessageAlert("Welcome to instaDAM");
-            openMainActivity(userName);
+            openMainActivity(email);
         } else {
             showMessageAlert("Can't login, create new account or edit the input.");
         }
@@ -81,10 +81,10 @@ public class SignIn extends AppCompatActivity {
         }, 1000);
     }
 
-    public void openMainActivity(String userName) {
+    public void openMainActivity(String email) {
         new Handler().postDelayed(() -> {
             Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("key", userName);
+            intent.putExtra("key", email);
             startActivity(intent);
             finish();
         }, 1000);
