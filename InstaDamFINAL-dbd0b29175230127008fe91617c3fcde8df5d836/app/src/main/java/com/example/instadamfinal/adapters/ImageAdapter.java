@@ -19,6 +19,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public ImageAdapter(Context context, List<Bitmap> bitmaps) {
         mContext = context;
         mBitmaps = bitmaps;
+        System.out.println("a");
     }
 
     @NonNull
