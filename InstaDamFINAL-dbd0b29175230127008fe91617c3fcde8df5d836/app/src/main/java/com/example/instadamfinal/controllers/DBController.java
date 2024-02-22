@@ -15,9 +15,6 @@ public class DBController {
 
     }
 
-
-
-
     public boolean registrarUsuario(Context context, String nombreUsuario, String emailUsuario, String passwordUsuario){
 
         boolean existeEmailUsuario = verificarExisteEmailUsuarioDB(context, emailUsuario);
@@ -44,13 +41,16 @@ public class DBController {
             DataBaseHelper dataBaseHelper = new DataBaseHelper(context);
             boolean resultado = dataBaseHelper.crearNuevoUsuarioHelper(nombreUsuario,emailUsuario,passwordUsuario);
             if (resultado){
-                FirebaseDataBaseHelper firebaseDataBaseHelper = new FirebaseDataBaseHelper();
-                firebaseDataBaseHelper.crearNuevoUsuarioFirebaseHelper(nombreUsuario,emailUsuario);
+                crearNuevoUsuarioFirebaseDB(nombreUsuario,emailUsuario);
             }
             return resultado;
 
         }catch (Exception e){
             return false;
         }
+    }
+    private void crearNuevoUsuarioFirebaseDB(String nombreUsuario, String emailUsuario){
+        FirebaseDataBaseHelper firebaseDataBaseHelper = new FirebaseDataBaseHelper();
+        firebaseDataBaseHelper.crearNuevoUsuarioFirebaseHelper(nombreUsuario,emailUsuario);
     }
 }

@@ -26,7 +26,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.instadamfinal.R;
+import com.example.instadamfinal.controllers.DBController;
+import com.example.instadamfinal.controllers.EmailController;
 import com.example.instadamfinal.controllers.FireStorageController;
+import com.example.instadamfinal.controllers.PasswordController;
+import com.example.instadamfinal.db.DataBaseHelper;
 import com.example.instadamfinal.models.Usuario;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -41,11 +45,13 @@ public class SettingsFragment extends Fragment {
     private Bitmap imagenDescargadaPerfil;
     private TextView textViewNombreUsuario;
     private TextView textViewEmailUsuario;
+    private TextView textViewMensajeAlerta;
     private EditText editTextTextNombreUsuarioInput;
     private EditText editTextTextEmailUsuarioInput;
     private EditText editTextTextPasswordInput;
     private Button buttonSubirImagenUsuario;
     private Button buttonActualizarDatosUsuario;
+
     private Usuario usuarioLogeado;
 
     private static final int SELECT_PHOTO = 100;
@@ -78,12 +84,6 @@ public class SettingsFragment extends Fragment {
         cargarEventosOnClickBotones();
 
 
-
-
-
-        //Con esto cargariamos la imagen de el almacenamiento cuando el usuario hace click
-        //buttonSubirImagen.setOnClickListener(v -> selectImageFromGallery());
-
         //PRIMERO VAMOS A MEJORAR LA DESCARGA DE IMAGEN.
         // Si el usuario hace click en el boton de enviar datos, entonces la foto
         //se tendrá que subir al servidor y tambien tenerla alojada en una referencia
@@ -112,6 +112,7 @@ public class SettingsFragment extends Fragment {
         //TextViews
         textViewNombreUsuario = view.findViewById(R.id.textViewNombreUsuario);
         textViewEmailUsuario = view.findViewById(R.id.textViewEmailUsuario);
+        textViewMensajeAlerta = view.findViewById(R.id.textViewMensajeAlertaSettings);
         //Inputs
         editTextTextNombreUsuarioInput = view.findViewById(R.id.editTextTextNombreUsuario);
         editTextTextEmailUsuarioInput = view.findViewById(R.id.editTextTextEmailUsuario);
@@ -124,7 +125,6 @@ public class SettingsFragment extends Fragment {
     }
 
     private void cargarEventosOnClickBotones() {
-
         buttonSubirImagenUsuario.setOnClickListener(this::actualizarImagenSubida);
         buttonActualizarDatosUsuario.setOnClickListener(this::actualizarDatosUsuario);
     }
@@ -162,7 +162,37 @@ public class SettingsFragment extends Fragment {
         }
     }
     private void actualizarDatosUsuario(View view) {
+        String nombreUsuario = editTextTextNombreUsuarioInput.getText().toString();
+        String emailUsuario = editTextTextEmailUsuarioInput.getText().toString();
+        String passwordUsuario = editTextTextPasswordInput.getText().toString();
 
+        if (!nombreUsuario.isEmpty() && !emailUsuario.isEmpty()&& !passwordUsuario.isEmpty())
+            if (EmailController.comprobarEmail(emailUsuario)&&
+                    PasswordController.comprobarPassword(passwordUsuario)){
+                //Ahora hemos verificado que los campos no estan vacios, y que el email y contraseña
+                //coinciden con los requisitos.
+                DataBaseHelper dataBaseHelper = new DataBaseHelper(this.getContext());
+                boolean resultadoExisteEmail = dataBaseHelper.verificarExisteEmailUsuarioHelper(emailUsuario);
+
+                if (!resultadoExisteEmail){
+                    //Actualizamos los datos de sqlite
+
+                    //Actualizamos los datos de firebase.
+
+
+                    //actualizamos el usuario.
+
+
+                }else
+                //Existe el usuario, no podemos actualizar los datos
+                    mostrarMensajeAlerta("El e-mail ya existe, no puedes utilizar un e-mail existente.");
+            }else
+                mostrarMensajeAlerta("El email o contraseña tiene que contener los requisitos mínimos.");
+        else
+            mostrarMensajeAlerta("No puede haber ningun campo vacío,rellena todos los campos.");
+    }
+    private void mostrarMensajeAlerta(String mensaje) {
+        textViewMensajeAlerta.setText(mensaje);
     }
     @SuppressLint("RestrictedApi")
     private void cargarDatosUsuarioFirebase(View view) {
@@ -207,7 +237,6 @@ public class SettingsFragment extends Fragment {
         });
     }
     private void cargarDatosActualPerfil() {
-
         textViewNombreUsuario.setText(usuarioLogeado.getUserName());
         textViewEmailUsuario.setText(usuarioLogeado.getEmail());
     }
