@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PasswordController {
-    public  String get_SHA_512_SecurePassword(String passwordToHash, String salt){
+    public static  String get_SHA_512_SecurePassword(String passwordToHash, String salt){
 
         String generatedPassword = null;
 
@@ -27,15 +27,14 @@ public class PasswordController {
         return generatedPassword;
     }
 
-    public boolean checkPassword(String password) {
+    public static boolean comprobarPassword(String password) {
         if (!password.isEmpty()){
-            String regex = "^(?=.*[A-Z])(?=.*[!@#$%^&*()-+=<>?]).{8,}$";
 
-            Pattern pattern = Pattern.compile(regex);
-
+            String expresionRegex = "^(?=.*[A-Z])(?=.*[!@#$%^&*()-+=<>?]).{8,}$";
+            Pattern pattern = Pattern.compile(expresionRegex);
             Matcher matcher = pattern.matcher(password);
-
             return matcher.matches();
+
         }else
             return false;
 

@@ -26,14 +26,13 @@ public class SplashScreen extends AppCompatActivity {
         cargarActivityInicioApp();
     }
     private void cargarRecursosVista() {
-        textoMensajeBienvenida = findViewById(R.id.textViewLogo);
+        textoMensajeBienvenida = findViewById(R.id.textViewMensajeBienvenida);
         imagenLogo = findViewById(R.id.logoInstaDam);
+
     }
     private void cargarImagenLogo() {
         imagenLogo.setImageResource(R.drawable.logo_instadam);
     }
-
-
 
     private void aplicarEfectoImagenLogo() {
         //Primero declaramos las variables que serán los puntos en el eje

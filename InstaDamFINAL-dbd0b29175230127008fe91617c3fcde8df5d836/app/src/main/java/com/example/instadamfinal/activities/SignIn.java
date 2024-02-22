@@ -50,7 +50,7 @@ public class SignIn extends AppCompatActivity {
         EmailController emailController = new EmailController();
         PasswordController passwordController = new PasswordController();
 
-        if (emailController.checkEmail(email) && passwordController.checkPassword(password)) {
+        if (emailController.comprobarEmail(email) && passwordController.comprobarPassword(password)) {
             loginUser(email, password);
         } else {
             showMessageAlert("Datos incorrectos");

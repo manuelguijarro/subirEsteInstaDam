@@ -55,61 +55,36 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return userName;
     }
 
-    public boolean checkEmailHelper(String email){
+    public boolean verificarExisteEmailUsuarioHelper(String emailUsuario){
         Cursor cursor = this.getReadableDatabase().query(
                 StructureDB.PERSONAL_DATA_TABLE,
                 new String[]{StructureDB.COLUMN_EMAIL},
                 StructureDB.COLUMN_EMAIL+ " = ?",
-                new String[]{email},
+                new String[]{emailUsuario},
                 null,
                 null,
                 StructureDB.COLUMN_EMAIL + " DESC"
         );
 
-        int cursorQuanty = cursor.getCount();
+        int resultadoCantidadEmail = cursor.getCount();
+
         cursor.close();
 
-        return  cursorQuanty > 0;
+        return  resultadoCantidadEmail > 0;
 
     }
 
-    public boolean createNewUserHelper(String userName,String email,String password){
+    public boolean crearNuevoUsuarioHelper(String nombreUsuario, String emailUsuario, String passwordUsuario){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         //Aqui ciframos la contraseña
-        PasswordController passwordController = new PasswordController();
-        String newPassword = passwordController.get_SHA_512_SecurePassword(password,"ambgk");
-        values.put(StructureDB.COLUMN_USERNAME,userName);
-        values.put(StructureDB.COLUMN_EMAIL,email);
-        values.put(StructureDB.COLUMN_PASS,newPassword);
+        String passwordUsuarioCifrada = PasswordController.get_SHA_512_SecurePassword(passwordUsuario,"ambgk");
+        values.put(StructureDB.COLUMN_USERNAME,nombreUsuario);
+        values.put(StructureDB.COLUMN_EMAIL,emailUsuario);
+        values.put(StructureDB.COLUMN_PASS,passwordUsuarioCifrada);
         long numID = db.insert(StructureDB.PERSONAL_DATA_TABLE,null,values);
         return numID != -1;
-    }
-
-
-    public Usuario buscarUsuarioPorEmail(String email) {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(
-                StructureDB.PERSONAL_DATA_TABLE,
-                new String[]{StructureDB.COLUMN_USERNAME, StructureDB.COLUMN_EMAIL},
-                StructureDB.COLUMN_EMAIL + " = ?",
-                new String[]{email},
-                null,
-                null,
-                null
-        );
-
-        Usuario usuario = null;
-
-        if (cursor != null && cursor.moveToFirst()) {
-            String nombreUsuario = cursor.getString(cursor.getColumnIndexOrThrow(StructureDB.COLUMN_USERNAME));
-            String emailUsuario = cursor.getString(cursor.getColumnIndexOrThrow(StructureDB.COLUMN_EMAIL));
-            cursor.close();
-        }
-
-        return usuario;
     }
 }
 
