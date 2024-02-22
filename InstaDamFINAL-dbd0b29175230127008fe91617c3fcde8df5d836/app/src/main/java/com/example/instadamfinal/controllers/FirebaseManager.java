@@ -15,22 +15,20 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.google.firebase.storage.FirebaseStorage;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FirebaseManager {
-    public interface MyResponseListener {
+    public interface respuestaSubirImagenListener {
         void onSuccess();
         void onFailure();
     }
 
     private static final String TAG = "FirebaseManager";
 
-    public static void uploadImage(Context context, Bitmap imageBitmap, String imageName, MyResponseListener listener) {
+    public static void uploadImage(Context context, Bitmap imageBitmap, String imageName, respuestaSubirImagenListener listener) {
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://instadam-76807.appspot.com");
         StorageReference storageRef = storage.getReference().child("imagenes").child(imageName);
 
@@ -55,49 +53,6 @@ public class FirebaseManager {
             listener.onSuccess();
         });
     }
-    public interface OnImageDownloadListener {
-        void onImageDownload(Bitmap bitmap);
-    }
-    public static void downloadImage(Context context,String imageName, OnImageDownloadListener listener) {
-        FirebaseStorage storage = FirebaseStorage.getInstance("gs://instadam-76807.appspot.com");
-        StorageReference storageRef = storage.getReference().child("imagenes").child(imageName);
-        final long BYTES = 10*(1024 * 1024);
-        storageRef.getBytes(BYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                listener.onImageDownload(bitmap);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-                Toast.makeText(context, "Error al descargar la imagen de perfil", Toast.LENGTH_SHORT).show();
-                listener.onImageDownload(null);
-            }
-        });
-    }
-
-    /*
-
-    // Descargar una imagen de Firebase Storage
-    public static void downloadImage(String imageName, final OnImageDownloadListener listener) {
-        FirebaseStorage storage = FirebaseStorage.getInstance("gs://instadam-76807.appspot.com");
-        StorageReference storageRef = storage.getReference().child("imagenes").child(imageName);
-
-
-        final long BYTES = 10*(1024 * 1024);
-        storageRef.getBytes(BYTES).addOnSuccessListener(bytes -> {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            listener.onImageDownload(bitmap);
-        }).addOnFailureListener(exception -> {
-            Log.e(TAG, "downloadImage: Failed to download image", exception);
-            listener.onImageDownload(null);
-        });
-    }
-
-
-    */
     public interface OnImagesDownloadListener {
         void onImagesDownloaded(List<Bitmap> bitmaps);
     }

@@ -7,6 +7,7 @@ import static com.example.instadamfinal.activities.MainActivity.emailUsuarioStat
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -18,13 +19,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.instadamfinal.R;
-import com.example.instadamfinal.controllers.FirebaseManager;
+import com.example.instadamfinal.controllers.FireStorageController;
 import com.example.instadamfinal.models.Usuario;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -42,6 +44,8 @@ public class SettingsFragment extends Fragment {
     private EditText editTextTextNombreUsuarioInput;
     private EditText editTextTextEmailUsuarioInput;
     private EditText editTextTextPasswordInput;
+    private Button buttonSubirImagenUsuario;
+    private Button buttonActualizarDatosUsuario;
     private Usuario usuarioLogeado;
 
     private static final int SELECT_PHOTO = 100;
@@ -65,12 +69,13 @@ public class SettingsFragment extends Fragment {
         // Mostrar Toast de carga(no funciona correctamente en emulador)
         Toast.makeText(getContext(), "Cargando datos...", Toast.LENGTH_SHORT).show();
 
+        //Primero cargamos la base de datos de firebase y luego cargamos todo lo demas.
+
         cargarDatosUsuarioFirebase(view);
 
+        cargarRecursosFragmento(view);
 
-
-
-
+        cargarEventosOnClickBotones();
 
 
 
@@ -103,6 +108,62 @@ public class SettingsFragment extends Fragment {
         return view;
     }
 
+    private void cargarRecursosFragmento(View view) {
+        //TextViews
+        textViewNombreUsuario = view.findViewById(R.id.textViewNombreUsuario);
+        textViewEmailUsuario = view.findViewById(R.id.textViewEmailUsuario);
+        //Inputs
+        editTextTextNombreUsuarioInput = view.findViewById(R.id.editTextTextNombreUsuario);
+        editTextTextEmailUsuarioInput = view.findViewById(R.id.editTextTextEmailUsuario);
+        editTextTextPasswordInput = view.findViewById(R.id.editTextTextNombreUsuario);
+        //Imagenes
+        imageViewSubirImagenActualizarInput = view.findViewById(R.id.imageViewSubirImagenActualizar);
+        //Botones
+        buttonSubirImagenUsuario = view.findViewById(R.id.buttonSubirImagen);
+        buttonActualizarDatosUsuario = view.findViewById(R.id.buttonActualizarDatos);
+    }
+
+    private void cargarEventosOnClickBotones() {
+
+        buttonSubirImagenUsuario.setOnClickListener(this::actualizarImagenSubida);
+        buttonActualizarDatosUsuario.setOnClickListener(this::actualizarDatosUsuario);
+    }
+
+
+
+    private void actualizarImagenSubida(View view) {
+        seleccionarImagenDeGaleria();
+    }
+    private void seleccionarImagenDeGaleria() {
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == SELECT_PHOTO && resultCode == RESULT_OK) {
+            if (data != null) {
+                try {
+                    Uri imagenGaleriaSeleccionada = data.getData();
+                    InputStream imageStream = getActivity().getContentResolver().openInputStream(imagenGaleriaSeleccionada);
+
+
+                    Bitmap imagenGaleriaBitmap = BitmapFactory.decodeStream(imageStream);
+
+                    imageViewSubirImagenActualizarInput.setImageBitmap(imagenGaleriaBitmap);
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "Error al cargar la imagen", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+    private void actualizarDatosUsuario(View view) {
+
+    }
     @SuppressLint("RestrictedApi")
     private void cargarDatosUsuarioFirebase(View view) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -120,10 +181,7 @@ public class SettingsFragment extends Fragment {
                     //Realizamos desde aqui los metodos porque nos aseguramso que el usuario se a cargado de la base de datos
                     usuarioLogeado = usuario;
                     cargarImagenActualPerfil(view);
-                    cargarDatosActualPerfil(view);
-                    cargarRecursosFragmento(view);
-                    cargarEventosOnClickBotones(view);
-
+                    cargarDatosActualPerfil();
                 } else
                     Log.e(FragmentManager.TAG, "El objeto Usuario es null");
 
@@ -132,16 +190,14 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    //ESTE METODO LO USAMOS PARA CARGAR CORRECTAAMENTE LA IMAGEN
     private void cargarImagenActualPerfil(View view) {
-        imageViewPerfilUsuario = view.findViewById(R.id.imageViewPerfilUsuario);
 
-        FirebaseManager.downloadImage(getContext(), usuarioLogeado.getUrlImagenPerfil(), bitmap -> {
+        FireStorageController.descargarImagen(getContext(), usuarioLogeado.getUrlImagenPerfil(), bitmap -> {
             if (bitmap != null) {
-                imagenDescargadaPerfil = bitmap;
                 // Aquí es donde debes establecer la imagen en el ImageView
+                imageViewPerfilUsuario = view.findViewById(R.id.imageViewPerfilUsuario);
                 imageViewPerfilUsuario.post(() -> {
-                    imageViewPerfilUsuario.setImageBitmap(imagenDescargadaPerfil);
+                    imageViewPerfilUsuario.setImageBitmap(bitmap);
                     imageViewPerfilUsuario.setVisibility(View.VISIBLE);
                 });
             } else {
@@ -150,43 +206,9 @@ public class SettingsFragment extends Fragment {
             }
         });
     }
-    private void cargarDatosActualPerfil(View view) {
-        textViewNombreUsuario = view.findViewById(R.id.textViewNombreUsuario);
-        textViewEmailUsuario = view.findViewById(R.id.textViewEmailUsuario);
-        //aqui usamos los datos del Usuario:usuarioLogeado
+    private void cargarDatosActualPerfil() {
+
         textViewNombreUsuario.setText(usuarioLogeado.getUserName());
         textViewEmailUsuario.setText(usuarioLogeado.getEmail());
-    }
-
-    private void cargarRecursosFragmento(View view) {
-        editTextTextNombreUsuarioInput = view.findViewById(R.id.editTextTextNombreUsuario);
-        editTextTextEmailUsuarioInput = view.findViewById(R.id.editTextTextEmailUsuario);
-        editTextTextPasswordInput = view.findViewById(R.id.editTextTextPassword);
-        imageViewSubirImagenActualizarInput = view.findViewById(R.id.imageViewSubirImagenActualizar);
-    }
-
-    private void selectImageFromGallery() {
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
-        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == SELECT_PHOTO && resultCode == RESULT_OK) {
-            if (data != null) {
-                try {
-                    Uri selectedImage = data.getData();
-                    InputStream imageStream = getActivity().getContentResolver().openInputStream(selectedImage);
-                   // imagenSubirActualizar = BitmapFactory.decodeStream(imageStream);
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getContext(), "Error al cargar la imagen", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
     }
 }
