@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.instadamfinal.R;
 import com.example.instadamfinal.controllers.DBController;
@@ -23,7 +22,7 @@ public class SignUp extends AppCompatActivity {
     private EditText editTextPasswordUsuario;
     private TextView textViewMensajeAlertaRegistro;
     private Button botonEnviar;
-    private Button botonVolver;
+    private Button botonVolverInicioSesion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +42,13 @@ public class SignUp extends AppCompatActivity {
         //Texto
         textViewMensajeAlertaRegistro = findViewById(R.id.textViewMensajeAlerta);
         //Botones
-        botonVolver = findViewById(R.id.signUpButton);
+        botonVolverInicioSesion = findViewById(R.id.signUpButton);
         botonEnviar = findViewById(R.id.sendButton);
     }
 
     private void cargarEventosOnClickBotones() {
         botonEnviar.setOnClickListener(this::enviarFormulario);
-        botonVolver.setOnClickListener(this::cargarActivityInicioSesion);
+        botonVolverInicioSesion.setOnClickListener(this::cargarActivityInicioSesion);
     }
 
     private void enviarFormulario(View v) {

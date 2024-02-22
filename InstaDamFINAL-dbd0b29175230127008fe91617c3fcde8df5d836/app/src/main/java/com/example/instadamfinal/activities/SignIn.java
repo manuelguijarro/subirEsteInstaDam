@@ -16,64 +16,66 @@ import com.example.instadamfinal.controllers.EmailController;
 import com.example.instadamfinal.controllers.PasswordController;
 
 public class SignIn extends AppCompatActivity {
-    private EditText editTextEmailAddress;
-    private EditText editTextPassword;
-    private Button sendButton;
-    private Button signUpButton;
-    private TextView messageAlert;
+    private EditText editTextEmailUsuario;
+    private EditText editTextPasswordUsuario;
+    private Button botonEnviar;
+    private Button botonCargarRegistroUsuario;
+    private TextView textViewMensajeAlertaRegistro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-        initializeViews();
-        setOnClickListeners();
+
+        cargarRecursosVista();
+        cargarEventosOnClickBotones();
     }
 
-    private void initializeViews() {
-        editTextEmailAddress = findViewById(R.id.editTextEmailAddress);
-        editTextPassword = findViewById(R.id.editTextPassword);
-        sendButton = findViewById(R.id.sendButton);
-        signUpButton = findViewById(R.id.signUpButton);
-        messageAlert = findViewById(R.id.messageAlert);
+    private void cargarRecursosVista() {
+        //inputs
+        editTextEmailUsuario = findViewById(R.id.editTextEmailAddress);
+        editTextPasswordUsuario = findViewById(R.id.editTextPassword);
+        //botones
+        botonEnviar = findViewById(R.id.sendButton);
+        botonCargarRegistroUsuario = findViewById(R.id.signUpButton);
+        //texto
+        textViewMensajeAlertaRegistro = findViewById(R.id.messageAlert);
     }
 
-    private void setOnClickListeners() {
-        sendButton.setOnClickListener(this::sendForm);
-        signUpButton.setOnClickListener(this::openSignUpActivity);
+    private void cargarEventosOnClickBotones() {
+        botonEnviar.setOnClickListener(this::enviarFormulario);
+        botonCargarRegistroUsuario.setOnClickListener(this::cargarActivityRegistro);
     }
 
-    private void sendForm(View v) {
-        String email = editTextEmailAddress.getText().toString();
-        String password = editTextPassword.getText().toString();
+    private void enviarFormulario(View v) {
+        String emailUsuario = editTextEmailUsuario.getText().toString();
+        String passwordUsuario = editTextPasswordUsuario.getText().toString();
 
-        EmailController emailController = new EmailController();
-        PasswordController passwordController = new PasswordController();
-
-        if (emailController.comprobarEmail(email) && passwordController.comprobarPassword(password)) {
-            loginUser(email, password);
+        if (EmailController.comprobarEmail(emailUsuario) &&
+                PasswordController.comprobarPassword(passwordUsuario)) {
+            logearUsuario(emailUsuario, passwordUsuario);
         } else {
-            showMessageAlert("Datos incorrectos");
+            mostrarMensajeAlerta("Datos incorrectos");
         }
     }
 
-    private void loginUser(String email, String password) {
+    private void logearUsuario(String emailUsuario, String passwordUsuario) {
         DBController dbController = new DBController();
-        String userName = dbController.loginUser(this.getBaseContext(), email, password);
+        boolean existeUsuario = dbController.logearUsuarioController(this.getBaseContext(), emailUsuario, passwordUsuario);
 
-        if (userName != null) {
-            showMessageAlert("Welcome to instaDAM");
-            openMainActivity(email);
+        if (existeUsuario) {
+            mostrarMensajeAlerta("Bienvenido a InstaDAM " + emailUsuario);
+            cargarActivityMain(emailUsuario);
         } else {
-            showMessageAlert("Can't login, create new account or edit the input.");
+            mostrarMensajeAlerta("Error en inicio de sesion, registra un nuevo usuario o edita los inputs");
         }
     }
 
-    private void showMessageAlert(String message) {
-        messageAlert.setText(message);
+    private void mostrarMensajeAlerta(String mensaje) {
+        textViewMensajeAlertaRegistro.setText(mensaje);
     }
 
-    public void openSignUpActivity(View view) {
+    public void cargarActivityRegistro(View view) {
         new Handler().postDelayed(() -> {
             Intent intent = new Intent(this, SignUp.class);
             startActivity(intent);
@@ -81,10 +83,10 @@ public class SignIn extends AppCompatActivity {
         }, 1000);
     }
 
-    public void openMainActivity(String email) {
+    public void cargarActivityMain(String emailUsuario) {
         new Handler().postDelayed(() -> {
             Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("key", email);
+            intent.putExtra("key", emailUsuario);
             startActivity(intent);
             finish();
         }, 1000);

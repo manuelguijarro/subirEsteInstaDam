@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
 import com.example.instadamfinal.controllers.PasswordController;
-import com.example.instadamfinal.models.Usuario;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "users";
@@ -31,28 +30,26 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public String checkEmailAndPasswordHelper(String email, String password) {
+    public boolean comprobarEmailPasswordUsuarioDB(String emailUsuario, String passwordUsuario) {
         //Aqui ciframos la contraseña, para compararla con la cifrada previamente
-        String newPassword = "";
-        PasswordController passwordController = new PasswordController();
-        newPassword =  passwordController.get_SHA_512_SecurePassword(password,"ambgk");
+        String passwordUsuarioCifrada =  PasswordController.get_SHA_512_SecurePassword(passwordUsuario,"ambgk");
         Cursor cursor = this.getReadableDatabase().query(
                 StructureDB.PERSONAL_DATA_TABLE,
                 new String[]{StructureDB.COLUMN_USERNAME, StructureDB.COLUMN_EMAIL, StructureDB.COLUMN_PASS},
                 StructureDB.COLUMN_EMAIL + " = ? AND " + StructureDB.COLUMN_PASS + " = ?",
-                new String[]{email, newPassword},
+                new String[]{emailUsuario, passwordUsuarioCifrada},
                 null,
                 null,
                 StructureDB.COLUMN_EMAIL + " DESC"
         );
 
-        String userName = "";
-        while (cursor.moveToNext()){
-            userName = cursor.getString(cursor.getColumnIndexOrThrow(StructureDB.COLUMN_USERNAME));
-        }
+
+        int resultadoCantidadUsuario = cursor.getCount();
 
         cursor.close();
-        return userName;
+
+        return  resultadoCantidadUsuario > 0;
+
     }
 
     public boolean verificarExisteEmailUsuarioHelper(String emailUsuario){

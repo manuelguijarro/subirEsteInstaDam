@@ -2,19 +2,14 @@ package com.example.instadamfinal.fragments;
 
 import static android.app.Activity.RESULT_OK;
 
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import static com.example.instadamfinal.activities.MainActivity.emailUsuarioStatic;
-import static com.example.instadamfinal.activities.MainActivity.idUsuario;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -23,7 +18,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,28 +26,22 @@ import android.widget.Toast;
 import com.example.instadamfinal.R;
 import com.example.instadamfinal.controllers.FirebaseManager;
 import com.example.instadamfinal.models.Usuario;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class SettingsFragment extends Fragment {
     private ImageView imageViewPerfilUsuario;
+    private ImageView imageViewSubirImagenActualizarInput;
     private Bitmap imagenDescargadaPerfil;
     private TextView textViewNombreUsuario;
     private TextView textViewEmailUsuario;
+    private EditText editTextTextNombreUsuarioInput;
+    private EditText editTextTextEmailUsuarioInput;
+    private EditText editTextTextPasswordInput;
     private Usuario usuarioLogeado;
 
     private static final int SELECT_PHOTO = 100;
@@ -74,44 +62,20 @@ public class SettingsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        // Mostrar Toast de carga
+        // Mostrar Toast de carga(no funciona correctamente en emulador)
         Toast.makeText(getContext(), "Cargando datos...", Toast.LENGTH_SHORT).show();
 
-        // Creamos una referencia para usuarios_db
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference usuariosDBRef = db.collection("usuarios_db").document("usuario_" + emailUsuarioStatic);
-
-        usuariosDBRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                // Ocultar Toast cuando los datos se hayan descargado
-                Toast.makeText(getContext(), "Datos cargados", Toast.LENGTH_SHORT).show();
-
-                if (documentSnapshot.exists()) {
-                    Usuario usuario = documentSnapshot.toObject(Usuario.class);
-                    // Verifica si el objeto Usuario es null
-                    if (usuario != null) {
-                        // Usa el objeto Usuario aquí
-                        setUsuarioLogeado(usuario);
-                        cargarImagenActualPerfil(view);
-                        cargarDatosActualPerfil(view);
-
-                    } else {
-                        Log.e(FragmentManager.TAG, "El objeto Usuario es null");
-                    }
-                } else {
-                    Log.e(FragmentManager.TAG, "El documento no existe");
-                }
-            }
-        });
+        cargarDatosUsuarioFirebase(view);
 
 
 
 
 
 
-        //cargarAtributos(view);
+
+
+
+
         //Con esto cargariamos la imagen de el almacenamiento cuando el usuario hace click
         //buttonSubirImagen.setOnClickListener(v -> selectImageFromGallery());
 
@@ -138,53 +102,69 @@ public class SettingsFragment extends Fragment {
         });*/
         return view;
     }
-    private void setUsuarioLogeado(Usuario usuario) {
-        usuarioLogeado = usuario;
-    }
-    private void cargarDatosActualPerfil(View view) {
-        textViewNombreUsuario = view.findViewById(R.id.textViewNombreUsuario);
-        textViewEmailUsuario = view.findViewById(R.id.textViewEmailUsuario);
-        //aqui usamos los datos del Usuario:usuarioLogeado
 
-       textViewNombreUsuario.setText(usuarioLogeado.getUserName());
-       textViewEmailUsuario.setText(usuarioLogeado.getEmail());
+    @SuppressLint("RestrictedApi")
+    private void cargarDatosUsuarioFirebase(View view) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference usuariosDBRef = db.collection("usuarios_db").document("usuario_" + emailUsuarioStatic);
 
+        usuariosDBRef.get().addOnSuccessListener(documentSnapshot -> {
+            // Ocultar Toast cuando los datos se hayan descargado(no funciona emulador)
+            Toast.makeText(getContext(), "Datos cargados", Toast.LENGTH_SHORT).show();
+
+            if (documentSnapshot.exists()) {
+                Usuario usuario = documentSnapshot.toObject(Usuario.class);
+                // Verifica si el objeto Usuario es null
+                if (usuario != null) {
+                    // Usa el objeto Usuario aquí
+                    //Realizamos desde aqui los metodos porque nos aseguramso que el usuario se a cargado de la base de datos
+                    usuarioLogeado = usuario;
+                    cargarImagenActualPerfil(view);
+                    cargarDatosActualPerfil(view);
+                    cargarRecursosFragmento(view);
+                    cargarEventosOnClickBotones(view);
+
+                } else
+                    Log.e(FragmentManager.TAG, "El objeto Usuario es null");
+
+            } else
+                Log.e(FragmentManager.TAG, "El documento no existe");
+        });
     }
 
     //ESTE METODO LO USAMOS PARA CARGAR CORRECTAAMENTE LA IMAGEN
     private void cargarImagenActualPerfil(View view) {
         imageViewPerfilUsuario = view.findViewById(R.id.imageViewPerfilUsuario);
 
-        FirebaseManager.downloadImage(getContext(), usuarioLogeado.getUrlImagenPerfil(), new FirebaseManager.OnImageDownloadListener() {
-            @Override
-            public void onImageDownload(Bitmap bitmap) {
-                if (bitmap != null) {
-                    imagenDescargadaPerfil = bitmap;
-                    // Aquí es donde debes establecer la imagen en el ImageView
-                    imageViewPerfilUsuario.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            imageViewPerfilUsuario.setImageBitmap(imagenDescargadaPerfil);
-                            imageViewPerfilUsuario.setVisibility(View.VISIBLE);
-                        }
-                    });
-                } else {
-                    // Maneja el caso en que la descarga falla o no hay imagen
-                    // Podrías mostrar una imagen predeterminada o hacer otra acción aquí
-                }
+        FirebaseManager.downloadImage(getContext(), usuarioLogeado.getUrlImagenPerfil(), bitmap -> {
+            if (bitmap != null) {
+                imagenDescargadaPerfil = bitmap;
+                // Aquí es donde debes establecer la imagen en el ImageView
+                imageViewPerfilUsuario.post(() -> {
+                    imageViewPerfilUsuario.setImageBitmap(imagenDescargadaPerfil);
+                    imageViewPerfilUsuario.setVisibility(View.VISIBLE);
+                });
+            } else {
+                // Maneja el caso en que la descarga falla o no hay imagen
+                // Podrías mostrar una imagen predeterminada o hacer otra acción aquí
             }
         });
     }
-
-    private void cargarAtributos(View view) {
-        /*
-        imagenPerfilActualizar = view.findViewById(R.id.imagenPerfilActualizar);
-        botonEnviarForm = view.findViewById(R.id.botonEnviarForm);
-        buttonSubirImagen = view.findViewById(R.id.buttonSubirImagen);
-        editTextUserName2 = view.findViewById(R.id.editTextUserName2);
-        editTextEmailAddress2 = view.findViewById(R.id.editTextEmailAddress2);
-        editTextPassword2 = view.findViewById(R.id.editTextPassword2);*/
+    private void cargarDatosActualPerfil(View view) {
+        textViewNombreUsuario = view.findViewById(R.id.textViewNombreUsuario);
+        textViewEmailUsuario = view.findViewById(R.id.textViewEmailUsuario);
+        //aqui usamos los datos del Usuario:usuarioLogeado
+        textViewNombreUsuario.setText(usuarioLogeado.getUserName());
+        textViewEmailUsuario.setText(usuarioLogeado.getEmail());
     }
+
+    private void cargarRecursosFragmento(View view) {
+        editTextTextNombreUsuarioInput = view.findViewById(R.id.editTextTextNombreUsuario);
+        editTextTextEmailUsuarioInput = view.findViewById(R.id.editTextTextEmailUsuario);
+        editTextTextPasswordInput = view.findViewById(R.id.editTextTextPassword);
+        imageViewSubirImagenActualizarInput = view.findViewById(R.id.imageViewSubirImagenActualizar);
+    }
+
     private void selectImageFromGallery() {
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");

@@ -27,9 +27,7 @@ public class FirebaseManager {
         void onSuccess();
         void onFailure();
     }
-    public interface OnImageDownloadListener {
-        void onImageDownload(Bitmap bitmap);
-    }
+
     private static final String TAG = "FirebaseManager";
 
     public static void uploadImage(Context context, Bitmap imageBitmap, String imageName, MyResponseListener listener) {
@@ -56,6 +54,9 @@ public class FirebaseManager {
             Log.d(TAG, "uploadImage: Image uploaded successfully");
             listener.onSuccess();
         });
+    }
+    public interface OnImageDownloadListener {
+        void onImageDownload(Bitmap bitmap);
     }
     public static void downloadImage(Context context,String imageName, OnImageDownloadListener listener) {
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://instadam-76807.appspot.com");
@@ -100,6 +101,10 @@ public class FirebaseManager {
     public interface OnImagesDownloadListener {
         void onImagesDownloaded(List<Bitmap> bitmaps);
     }
+
+
+
+
     public static void downloadImages(Context context, List<String> imageUrls, OnImagesDownloadListener listener) {
         List<Bitmap> bitmaps = new ArrayList<>();
 

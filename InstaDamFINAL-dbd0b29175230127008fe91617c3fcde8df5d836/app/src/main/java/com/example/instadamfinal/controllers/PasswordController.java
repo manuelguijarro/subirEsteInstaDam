@@ -27,12 +27,12 @@ public class PasswordController {
         return generatedPassword;
     }
 
-    public static boolean comprobarPassword(String password) {
-        if (!password.isEmpty()){
+    public static boolean comprobarPassword(String passwordUsuario) {
+        if (!passwordUsuario.isEmpty()){
 
             String expresionRegex = "^(?=.*[A-Z])(?=.*[!@#$%^&*()-+=<>?]).{8,}$";
             Pattern pattern = Pattern.compile(expresionRegex);
-            Matcher matcher = pattern.matcher(password);
+            Matcher matcher = pattern.matcher(passwordUsuario);
             return matcher.matches();
 
         }else

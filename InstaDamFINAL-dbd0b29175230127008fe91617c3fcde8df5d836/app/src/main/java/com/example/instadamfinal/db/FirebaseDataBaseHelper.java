@@ -44,4 +44,14 @@ public class FirebaseDataBaseHelper {
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
                 .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
     }
+
+
+
+    public interface MyCallback {
+        void onCallback(Usuario usuario);
+    }
+
+    public void cargarDatosUsuarioFirebaseHelper(){
+
+    }
 }

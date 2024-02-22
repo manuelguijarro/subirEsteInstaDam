@@ -8,21 +8,19 @@ import com.example.instadamfinal.db.FirebaseDataBaseHelper;
 
 public class DBController {
 
-    public String loginUser(Context context,String email,String password){
-
-        return checkUserDB(context,email,password);
-
-    }
-
-    private String checkUserDB(Context context,String email,String password) {
+    public boolean logearUsuarioController(Context context, String emailUsuario, String passwordUsuario){
 
         DataBaseHelper dataBaseHelper = new DataBaseHelper(context);
-        return dataBaseHelper.checkEmailAndPasswordHelper(email,password);
+        return dataBaseHelper.comprobarEmailPasswordUsuarioDB(emailUsuario,passwordUsuario);
 
     }
+
+
+
+
     public boolean registrarUsuario(Context context, String nombreUsuario, String emailUsuario, String passwordUsuario){
 
-        boolean existeEmailUsuario = verificarEmailUsuarioDB(context, emailUsuario);
+        boolean existeEmailUsuario = verificarExisteEmailUsuarioDB(context, emailUsuario);
 
         if (existeEmailUsuario)
             return false;//porque existe el email en la base de datos
@@ -31,7 +29,7 @@ public class DBController {
 
         return resultadoCrearNuevoUsuario;
     }
-    private boolean verificarEmailUsuarioDB(Context context, String emailUsuario) {
+    private boolean verificarExisteEmailUsuarioDB(Context context, String emailUsuario) {
 
         DataBaseHelper dataBaseHelper = new DataBaseHelper(context);
 
