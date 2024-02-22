@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.example.instadamfinal.R;
 import com.example.instadamfinal.activities.MainActivity;
-import com.example.instadamfinal.adapters.ImageAdapter;
 import com.example.instadamfinal.controllers.FirebaseManager;
 import com.example.instadamfinal.models.Publicacion;
 import com.example.instadamfinal.models.Usuario;
@@ -67,8 +66,8 @@ public class PerfilFragment extends Fragment {
                             @Override
                             public void onImagesDownloaded(List<Bitmap> bitmaps) {
                                 // Configurar el adaptador con las imágenes descargadas
-                                ImageAdapter adapter = new ImageAdapter(getContext(), bitmaps);
-                                recyclerView.setAdapter(adapter);
+                              //  ImageAdapter adapter = new ImageAdapter(getContext(), bitmaps);
+                               // recyclerView.setAdapter(adapter);
                             }
                         });
                     }
